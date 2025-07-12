@@ -57,6 +57,12 @@ pipeline {
             }
         }
 
+	stage("Build Application After Test") {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+	    
         stage("Build & Push Docker Image") {
 	    steps {
 	        script {
