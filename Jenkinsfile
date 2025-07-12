@@ -25,32 +25,28 @@ pipeline {
             }
         }
 
-      stage("Test Application") {
-          steps {
-               sh 'mvn test'
-          }
-      }
+        stage("Test Application") {
+            steps {
+                sh 'mvn test'
+            }
+        }
 
-      stage("SonarQube Analysis") {
-          steps {
-                  script{
-                      withSonarQubeEnv(credentialId: 'jenins-sonarqube-token'){
-                          sh "mvn sonar:sonar"
-                      }  
-                  }
-               sh 'mvn test'
-          }
+        stage("SonarQube Analysis") {
+            steps {
+                script {
+                    withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-token') {
+                        sh 'mvn sonar:sonar'
+                    }
+                }
+            }
+        }
 
-      stage("Quality Gate") {
-        steps {
+        stage("Quality Gate") {
+            steps {
                 script {
                     waitForQualityGate abortPipeline: false, credentialsId: 'jenkins-sonarqube-token'
                 }
+            }
         }
-      }
-
-          
-      }
-
     }
 }
