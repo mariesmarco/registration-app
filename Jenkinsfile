@@ -5,7 +5,11 @@ pipeline {
         jdk 'Java17'
         maven 'Maven3'
     }
-
+    environment {
+    		DOCKER_HUB_REPO = 'mariesmarco/cicd'
+    		DOCKER_HUB_CREDENTIALS_ID = 'GitOps-token-DockerHub'
+    }
+        
     stages {
         stage("Cleanup Workspace") {
             steps {
@@ -48,5 +52,27 @@ pipeline {
                 }
             }
         }
+
+        stage('Build Docker Image') {
+			steps {
+				script {
+					echo 'building docker image...'
+					dockerImage = docker.build("${DOCKER_HUB_REPO}:latest")
+				}
+			}
+		}
+
+        stage('Push Image to DockerHub'){
+			steps {
+				script {
+					echo 'pushing docker image to DockerHub...'
+					docker.withRegistry('https://registry.hub.docker.com', "${DOCKER_HUB_CREDENTIALS_ID}"){
+						dockerImage.push('latest')
+						}
+					}
+				}
+		}
+        
+        
     }
 }
