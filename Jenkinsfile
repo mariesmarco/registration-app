@@ -6,8 +6,12 @@ pipeline {
         maven 'Maven3'
     }
     environment {
-    		DOCKER_HUB_REPO = 'mariesmarco/cicd'
-    		DOCKER_HUB_CREDENTIALS_ID = 'GitOps-token-DockerHub'
+	        APP_NAME   = "register-app-pipeline"
+	        RELEASE    = "1.0.0"
+		DOCKER_USER = "mariesmarco"
+		DOCKER_PASS = "dckr_pat_Z8IlLzh2m0tNC9guIwDyYjZDZAc"
+	        IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
+	        IMAGE_TAG  = "${RELEASE}-${BUILD_NUMBER}"
     }
         
     stages {
@@ -53,25 +57,17 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
-			steps {
-				script {
-					echo 'building docker image...'
-					dockerImage = docker.build("${DOCKER_HUB_REPO}:latest")
-				}
-			}
-		}
-
-        stage('Push Image to DockerHub'){
-			steps {
-				script {
-					echo 'pushing docker image to DockerHub...'
-					docker.withRegistry('https://registry.hub.docker.com', "${DOCKER_HUB_CREDENTIALS_ID}"){
-						dockerImage.push('latest')
-						}
-					}
-				}
-		}
+        stage("Build & Push Docker Image") {
+	    steps {
+	        script {
+	            docker.withRegistry('', 'dockerhub-creds') {
+	                def docker_image = docker.build("${IMAGE_NAME}")
+	                docker_image.push("${IMAGE_TAG}")
+	                docker_image.push("latest")
+	            }
+	        }
+	    }
+	}
         
         
     }
