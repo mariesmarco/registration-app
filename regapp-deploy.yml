@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: regapp
-        image: mariesmarco/register-app-pipeline
+        image: mariesmarco/register-app-pipeline:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
